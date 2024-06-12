@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Firebase OTP Auth</title>
+        <script src="https://www.gstatic.com/firebasejs/4.3.1/firebase.js"></script>
+    <!-- Firebase App (the core Firebase SDK) -->
+    <script  type="module" src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js"></script>
+    <!-- Firebase Authentication -->
+    <script  type="module" src="https://www.gstatic.com/firebasejs/9.6.1/firebase-auth.js"></script>
+    
+</head>
+<body>
+    <h2>Firebase OTP Authentication</h2>
+    <div id="recaptcha-container"></div>
+    <div>
+        <input type="text" id="phone-number" placeholder="Enter phone number">
+        <button onclick="sendOTP()">Send OTP</button>
+    </div>
+    <div>
+        <input type="text" id="otp" placeholder="Enter OTP">
+        <button onclick="verifyOTP()">Verify OTP</button>
+    </div>
+  <script>
+  // Import the functions you need from the SDKs you need
+
+  // TODO: Add SDKs for Firebase products that you want to use
+  // https://firebase.google.com/docs/web/setup#available-libraries
+
+  // Your web app's Firebase configuration
+  // For Firebase JS SDK v7.20.0 and later, measurementId is optional
+  const firebaseConfig = {
+    apiKey: "AIzaSyCLSlcFjRwvf1b1z_oYqJ9wWfDuzdWNLHU",
+    authDomain: "online-exam-portal-6b887.firebaseapp.com",
+    projectId: "online-exam-portal-6b887",
+    storageBucket: "online-exam-portal-6b887.appspot.com",
+    messagingSenderId: "917084614594",
+    appId: "1:917084614594:web:4e658eeb5f4b8c3f15705b",
+    measurementId: "G-QFBMLJDES3"
+  };
+        // Initialize Firebase
+        if (!firebase.apps.length) {
+            firebase.initializeApp(firebaseConfig);
+        } else {
+            firebase.app(); // If already initialized, use that one
+        }
+
+        // Initialize Recaptcha verifier
+        window.recaptchaVerifier = new firebase.auth.RecaptchaVerifier('recaptcha-container', {
+            'size': 'invisible',
+            'callback': (response) => {
+                // reCAPTCHA solved, allow sendOTP()
+            }
+        });
+
+        function sendOTP() {
+            const phoneNumber = document.getElementById('phone-number').value;
+            const appVerifier = window.recaptchaVerifier;
+            firebase.auth().signInWithPhoneNumber(phoneNumber, appVerifier)
+                .then((confirmationResult) => {
+                    window.confirmationResult = confirmationResult;
+                    alert('OTP sent!');
+                }).catch((error) => {
+                    console.error('Error during signInWithPhoneNumber', error);
+                    alert('Failed to send OTP. Please try again.');
+                });
+        }
+
+        function verifyOTP() {
+            const otp = document.getElementById('otp').value;
+            window.confirmationResult.confirm(otp).then((result) => {
+                const user = result.user;
+                alert('OTP verified! User signed in successfully.');
+            }).catch((error) => {
+                console.error('Error during confirmation', error);
+                alert('Failed to verify OTP. Please try again.');
+            });
+        }
+    </script>
+    
+</body>
+</html>
